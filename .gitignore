@@ -3,6 +3,10 @@
 
 # Python Cache
 __pycache__/
+*.log
+
+# Exclude raw materials (only encrypted zip allowed)
+materials/
 *.py[cod]
 *$py.class
 
