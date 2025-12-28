@@ -1,0 +1,22 @@
+# Environment Variables (Secrets)
+.env
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Streamlit config (optional, but usually local dev config shouldn't force override cloud)
+.streamlit/
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Windows thumbs
+Thumbs.db
