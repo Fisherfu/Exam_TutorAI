@@ -6,16 +6,62 @@ import json
 from dotenv import load_dotenv
 
 # --- Config ---
-st.set_page_config(page_title="社科 AI 助教", page_icon="🎓", layout="centered")
+st.set_page_config(
+    page_title="社科 AI 助教",
+    page_icon="🎓",
+    layout="centered",
+    initial_sidebar_state="auto",
+)
 load_dotenv()
 
+# --- PWA & Mobile Meta Tags ---
+st.markdown("""
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="社科AI助教">
+<meta name="description" content="您的個人化社會學 AI 助教 - 隨時練習，即時批改">
+<style>
+    /* Mobile-friendly improvements */
+    .stButton > button {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1.05rem;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+    .stRadio > div {
+        gap: 0.5rem;
+    }
+    .stTextArea textarea {
+        font-size: 1rem;
+        min-height: 120px;
+    }
+    @media (max-width: 768px) {
+        .stSidebar { font-size: 1rem; }
+        h1 { font-size: 1.6rem !important; }
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # --- API Setup ---
-# Try to get API Key from environment (System or .env)
-api_key = os.getenv("GEMINI_API_KEY") 
+# Priority 1: Streamlit Secrets (Cloud deployment)
+try:
+    api_key = st.secrets.get("GEMINI_API_KEY", None)
+except Exception:
+    api_key = None
+
+# Priority 2: Environment Variable (.env for local dev)
 if not api_key:
-    # Fallback: User input in sidebar if not Environment
+    api_key = os.getenv("GEMINI_API_KEY")
+
+# Priority 3: User input in sidebar
+if not api_key:
     with st.sidebar:
-        api_key = st.text_input("Gemini API Key", type="password")
+        st.markdown("### ⚙️ 設定")
+        api_key = st.text_input("Gemini API Key", type="password", help="請輸入您的 Google Gemini API Key")
         if not api_key:
             st.warning("請輸入您的 Gemini API Key 以繼續")
             st.stop()
@@ -133,6 +179,23 @@ if not materials:
 
 topic_list = list(materials.keys())
 selected_topic = st.sidebar.selectbox("📚 選擇單元/週次", topic_list)
+
+# --- Mobile Install Tip ---
+with st.sidebar.expander("📲 加到手機主畫面"):
+    st.markdown("""
+**iPhone (iOS Safari)**
+1. 點下方 **分享** 按鈕 `⬆`
+2. 選擇「**加入主畫面**」
+3. 按「新增」完成 ✅
+
+**Android (Chrome)**
+1. 點右上角 **⋮** 選單
+2. 選擇「**新增至主畫面**」
+3. 按「新增」完成 ✅
+
+加完後可像 App 一樣從主畫面直接開啟！
+    """)
+
 
 # Reset state if topic changes
 if selected_topic != st.session_state.current_topic:
