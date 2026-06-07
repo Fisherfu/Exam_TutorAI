@@ -3,3 +3,6 @@ python-docx
 google-generativeai
 python-dotenv
 pyzipper
+pdfplumber
+requests
+beautifulsoup4
