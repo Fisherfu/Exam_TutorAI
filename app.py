@@ -374,7 +374,7 @@ python pdf_to_questions.py
         with ctrl1:
             n_questions = st.selectbox(
                 "📝 出題數",
-                [10, 20, 30, "全部"],
+                [4, 8, 12, "全部"],
                 index=0,
                 key="mock_n",
             )
