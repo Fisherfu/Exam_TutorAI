@@ -1,4 +1,5 @@
 import os
+import json
 import pyzipper
 from io import BytesIO
 from docx import Document
@@ -7,6 +8,26 @@ from dotenv import load_dotenv
 
 # Load environment variables (for local dev)
 env_path = os.path.join(os.getcwd(), '.env')
+
+def load_config():
+    """Loads configuration settings from config.json."""
+    config_path = os.path.join(os.path.dirname(__file__), "config.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"[Warning] Failed to read config.json: {e}")
+    # Default fallback
+    return {
+        "subject_name": "社會學",
+        "assistant_role": "專業社會學助教",
+        "focus_instruction": "請著重於社會學理論、學派（如結構功能論、衝突論、符號互動論）及學者觀點之應用。",
+        "materials_dir": "materials",
+        "target_exam_keywords": ["高等考試三級", "地方政府公務人員", "原住民族", "身心障礙"],
+        "target_subject": "社會學"
+    }
+
 def get_material_password():
     """Retrieve password from environment or Streamlit secrets."""
     # Priority 1: Streamlit Secrets (Cloud)
@@ -27,8 +48,9 @@ def load_materials():
     Priority 1: Load from unencrypted 'materials' directory (for local testing).
     Priority 2: Load from encrypted 'materials.zip' (for cloud deployment).
     """
+    config = load_config()
     materials = {}
-    materials_dir = "materials"
+    materials_dir = config.get("materials_dir", "materials")
     zip_path = "materials.zip"
     
     # ── 1. 優先從本機的 materials 資料夾讀取（不加密） ──

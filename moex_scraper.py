@@ -13,16 +13,19 @@ from bs4 import BeautifulSoup
 import os, time, json, re
 from datetime import datetime
 from urllib.parse import urljoin
+import data_loader
 
 # ──────────────────────────────────────────────
-# 設定（只需改這裡）
+# 設定（讀取 config.json）
 # ──────────────────────────────────────────────
+config = data_loader.load_config()
+
 BASE_URL     = "https://wwwq.moex.gov.tw/exam/wFrmExamQandASearch.aspx"
 DOWNLOAD_DIR = "downloaded_pdfs"
 LOG_FILE     = "scraper_log.json"
 
-TARGET_EXAM_KEYWORDS = ["高等考試三級", "地方政府公務人員", "原住民族", "身心障礙"]
-TARGET_SUBJECT       = "社會學"
+TARGET_EXAM_KEYWORDS = config.get("target_exam_keywords", ["高等考試三級", "地方政府公務人員", "原住民族", "身心障礙"])
+TARGET_SUBJECT       = config.get("target_subject", config.get("subject_name", "社會學"))
 
 # 民國 110~115 年 → 西元 2021~2026
 YEAR_RANGE    = list(range(2021, 2027))

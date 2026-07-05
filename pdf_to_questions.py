@@ -18,10 +18,14 @@ from datetime import datetime
 import pdfplumber
 import google.generativeai as genai
 from dotenv import load_dotenv
+import data_loader
 
 # ──────────────────────────────────────────────
-# 設定區
+# 設定區（讀取 config.json）
 # ──────────────────────────────────────────────
+config = data_loader.load_config()
+subject_name = config.get("subject_name", "社會學")
+
 DOWNLOAD_DIR       = "downloaded_pdfs"
 QUESTION_BANK_FILE = "question_bank.json"
 MIN_TEXT_LENGTH    = 200
@@ -102,18 +106,18 @@ def extract_pdf_text(pdf_path: str) -> str | None:
 def parse_with_gemini(text: str, attempt: int = 0) -> list[dict]:
     """呼叫 Gemini 解析題目，含 retry 機制"""
     prompt = f"""
-你是台灣公務人員考試「社會學」科目的專業解析器。
+你是台灣公務人員考試「{subject_name}」科目的專業解析器。
 
 以下是從 PDF 解析出來的考試試題文字。
-台灣高考與特考的社會學通常為「申論題」（每份試卷約 4 題）。
+台灣高考與特考的{subject_name}通常為「申論題」（每份試卷約 4 題）。
 請找出所有的「申論題」並以嚴格 JSON 格式輸出。
 
 【解析規則】
 1. 提取完整的題目文字（包含題號與配分可視情況保留）。
 2. type 固定為 "essay"。
-3. explanation 請用繁體中文提供解析，點出這題的核心社會學考點、建議答題方向與可引用的理論學者，約 100~150 字。
+3. explanation 請用繁體中文提供解析，點出這題的核心{subject_name}考點、建議答題方向與可引用的理論學者/專業知識，約 100~150 字。
 4. 忽略任何無關的試場規則文字。
-5. 若找不到任何題目，輸出 {{"questions": []}}。
+5. 若找不到 any 題目，輸出 {{"questions": []}}。
 
 【試題文字】
 {text[:MAX_TEXT_TO_GEMINI]}
@@ -259,7 +263,7 @@ def main():
             q["year"]          = roc_year
             q["exam_type"]     = exam_name
             q["exam_category"] = detect_exam_category(exam_name)
-            q["subject"]       = "社會學"
+            q["subject"]       = subject_name
             q["source_file"]   = filename
             q["type"]          = "essay"
 

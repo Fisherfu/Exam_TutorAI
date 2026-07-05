@@ -5,9 +5,15 @@ import os
 import json
 from dotenv import load_dotenv
 
+# --- Load Config ---
+config = data_loader.load_config()
+subject_name = config.get("subject_name", "社會學")
+assistant_role = config.get("assistant_role", "專業社會學助教")
+focus_instruction = config.get("focus_instruction", "請著重於社會學理論、學派（如結構功能論、衝突論、符號互動論）及學者觀點之應用。")
+
 # --- Config ---
 st.set_page_config(
-    page_title="社科 AI 助教",
+    page_title=f"{subject_name} AI 助教",
     page_icon="🎓",
     layout="centered",
     initial_sidebar_state="auto",
@@ -15,34 +21,34 @@ st.set_page_config(
 load_dotenv()
 
 # --- PWA & Mobile Meta Tags ---
-st.markdown("""
+st.markdown(f"""
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1a1a2e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="社科AI助教">
-<meta name="description" content="您的個人化社會學 AI 助教 - 隨時練習，即時批改">
+<meta name="apple-mobile-web-app-title" content="{subject_name}AI助教">
+<meta name="description" content="您的個人化{subject_name} AI 助教 - 隨時練習，即時批改">
 <style>
     /* Mobile-friendly improvements */
-    .stButton > button {
+    .stButton > button {{
         width: 100%;
         padding: 0.75rem 1rem;
         font-size: 1.05rem;
         border-radius: 12px;
         font-weight: 600;
-    }
-    .stRadio > div {
+    }}
+    .stRadio > div {{
         gap: 0.5rem;
-    }
-    .stTextArea textarea {
+    }}
+    .stTextArea textarea {{
         font-size: 1rem;
         min-height: 120px;
-    }
-    @media (max-width: 768px) {
-        .stSidebar { font-size: 1rem; }
-        h1 { font-size: 1.6rem !important; }
-    }
+    }}
+    @media (max-width: 768px) {{
+        .stSidebar {{ font-size: 1rem; }}
+        h1 {{ font-size: 1.6rem !important; }}
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -122,7 +128,7 @@ if "mock_graded" not in st.session_state:
 def generate_quiz(topic_text):
     """Generates a quiz using Gemini in JSON format."""
     prompt = f"""
-    You are a professional Sociology Tutor. 
+    You are a professional {assistant_role} for the course '{subject_name}'. 
     Based on the following course material, generate a quiz in **Traditional Chinese (繁體中文)**.
     
     Content:
@@ -169,7 +175,7 @@ def grade_sa(question, student_answer, reference):
     Task:
     Provide a concise evaluation (Pass/Fail) and constructive feedback/correction. 
     **Reply in Traditional Chinese (繁體中文).**
-    Focus on sociology concepts.
+    Focus on {subject_name} concepts. {focus_instruction}
     """
     response = model.generate_content(prompt)
     return response.text
@@ -189,8 +195,8 @@ def load_question_bank():
         return None
 
 # --- UI Layout ---
-st.title("🎓 Exam_Tutor AI (中文版)")
-st.caption("您的個人化社會學 AI 助教")
+st.title(f"🎓 {subject_name} AI 助教")
+st.caption(f"您的個人化{subject_name} AI 學習助理")
 
 # ── 側邊欄：單元選擇（供 Tab 1 使用）──
 materials = data_loader.load_materials()
@@ -312,18 +318,18 @@ with tab1:
 
 
 # ══════════════════════════════════════════════
-# TAB 2：模擬考模式（考選部歷屆考古題）
+# TAB 2：模擬考模式（歷屆考古題）
 # ══════════════════════════════════════════════
 with tab2:
     st.subheader("🏆 模擬考模式")
-    st.caption("題目來源：考選部歷屆社會學考古題（高考三級 / 地方特考三等 / 原住民族 / 身障特考）")
+    st.caption(f"題目來源：歷屆{subject_name}考古題（依題庫來源而定）")
 
     bank = load_question_bank()
 
     # ── 未建立題庫 → 顯示建立說明 ──
     if not bank or bank["metadata"]["total"] == 0:
         st.warning("📭 題庫尚未建立，請依下列步驟操作：")
-        st.markdown("""
+        st.markdown(f"""
 ### 📋 建立題庫（一次性設定）
 
 **Step 1｜安裝新套件**
@@ -331,11 +337,11 @@ with tab2:
 pip install pdfplumber requests beautifulsoup4
 ```
 
-**Step 2｜從考選部下載歷屆試題 PDF**
+**Step 2｜下載歷屆試題 PDF**
 ```bash
 python moex_scraper.py
 ```
-> 預計下載 105~114 年，高考三級 / 地方特考 / 原住民族 / 身障特考的社會學試題
+> 預計下載該專業領域的 {subject_name} 試題
 
 **Step 3｜AI 解析 PDF → 建立題庫**
 ```bash

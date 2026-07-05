@@ -1,0 +1,13 @@
+{
+  "subject_name": "社會學",
+  "assistant_role": "專業社會學助教",
+  "focus_instruction": "請著重於社會學理論、學派（如結構功能論、衝突論、符號互動論）及學者觀點之應用。",
+  "materials_dir": "materials",
+  "target_exam_keywords": [
+    "高等考試三級",
+    "地方政府公務人員",
+    "原住民族",
+    "身心障礙"
+  ],
+  "target_subject": "社會學"
+}
